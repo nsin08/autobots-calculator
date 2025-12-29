@@ -58,6 +58,28 @@ python -m src.service.app
 pytest tests/
 ```
 
+### Using the Calculator
+
+Once the service is running, open your browser and navigate to:
+```
+http://localhost:5000
+```
+
+**Calculator Features:**
+- Click number buttons (0-9) to enter numbers
+- Click operation buttons (+, -, ×, ÷) to select operation
+- Click = to calculate result
+- Click C to clear
+- Click ← to delete last character
+- Keyboard support: numbers, operators, Enter/=, Escape/C, Backspace
+
+**Example:**
+1. Click `5`
+2. Click `+`
+3. Click `3`
+4. Click `=`
+5. Result: `8`
+
 ## Endpoints
 
 ### GET /health

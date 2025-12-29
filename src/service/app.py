@@ -2,11 +2,12 @@
 Service application entry point.
 Minimal Flask service with health and metrics endpoints.
 """
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from datetime import datetime
 import time
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../../static')
 
 # Track service start time
 START_TIME = time.time()
@@ -92,8 +93,14 @@ def calculate():
 
 
 @app.route('/', methods=['GET'])
-def root():
-    """Root endpoint with service info."""
+def index():
+    """Serve the calculator UI."""
+    return send_from_directory(app.static_folder, 'index.html')
+
+
+@app.route('/api', methods=['GET'])
+def api_info():
+    """API info endpoint."""
     return jsonify({
         'service': 'autobots-calculator',
         'version': '0.1.0',
