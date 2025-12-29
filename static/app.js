@@ -4,6 +4,9 @@ let previousValue = null;
 let waitingForOperand = false;
 let isScientificMode = false;
 let angleMode = 'DEG'; // 'DEG' or 'RAD'
+let isHistoryVisible = false;
+let calculationHistory = [];
+const MAX_HISTORY = 20;
 
 const display = document.getElementById('display');
 const errorDisplay = document.getElementById('error');
@@ -81,6 +84,9 @@ function performCalculation() {
     
     const apiOperator = operatorMap[operator];
     
+    // Save expression for history
+    const expression = `${previousValue} ${operator} ${inputValue}`;
+    
     // Call backend API
     fetch('/api/calculate', {
         method: 'POST',
@@ -103,6 +109,8 @@ function performCalculation() {
         } else {
             currentInput = String(data.result);
             previousValue = data.result;
+            // Add to history
+            addToHistory(expression, data.result);
         }
         updateDisplay();
     })
@@ -252,3 +260,103 @@ function calculateScientific(func) {
         console.error('Scientific calculation error:', error);
     }
 }
+
+// History Management
+function loadHistory() {
+    try {
+        const stored = sessionStorage.getItem('calculatorHistory');
+        if (stored) {
+            calculationHistory = JSON.parse(stored);
+            renderHistory();
+        }
+    } catch (error) {
+        console.error('Error loading history:', error);
+        calculationHistory = [];
+    }
+}
+
+function saveHistory() {
+    try {
+        sessionStorage.setItem('calculatorHistory', JSON.stringify(calculationHistory));
+    } catch (error) {
+        console.error('Error saving history:', error);
+    }
+}
+
+function addToHistory(expression, result) {
+    const entry = {
+        expression: expression,
+        result: result,
+        timestamp: new Date().toISOString()
+    };
+    
+    calculationHistory.unshift(entry); // Add to beginning
+    
+    // Keep only last 20 entries
+    if (calculationHistory.length > MAX_HISTORY) {
+        calculationHistory = calculationHistory.slice(0, MAX_HISTORY);
+    }
+    
+    saveHistory();
+    renderHistory();
+}
+
+function renderHistory() {
+    const historyList = document.getElementById('historyList');
+    
+    if (calculationHistory.length === 0) {
+        historyList.innerHTML = '<p class="no-history">No history</p>';
+        return;
+    }
+    
+    historyList.innerHTML = '';
+    
+    calculationHistory.forEach((entry, index) => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.onclick = () => loadFromHistory(entry);
+        
+        const expressionDiv = document.createElement('div');
+        expressionDiv.className = 'history-expression';
+        expressionDiv.textContent = entry.expression;
+        
+        const resultDiv = document.createElement('div');
+        resultDiv.className = 'history-result';
+        resultDiv.textContent = `= ${entry.result}`;
+        
+        historyItem.appendChild(expressionDiv);
+        historyItem.appendChild(resultDiv);
+        historyList.appendChild(historyItem);
+    });
+}
+
+function loadFromHistory(entry) {
+    currentInput = String(entry.result);
+    operator = null;
+    previousValue = null;
+    waitingForOperand = true;
+    updateDisplay();
+}
+
+function clearHistory() {
+    calculationHistory = [];
+    saveHistory();
+    renderHistory();
+}
+
+function toggleHistory() {
+    isHistoryVisible = !isHistoryVisible;
+    const panel = document.getElementById('historyPanel');
+    const toggle = document.getElementById('historyToggle');
+    
+    if (isHistoryVisible) {
+        panel.style.display = 'block';
+        toggle.classList.add('active');
+    } else {
+        panel.style.display = 'none';
+        toggle.classList.remove('active');
+    }
+}
+
+// Load history on page load
+window.addEventListener('load', loadHistory);

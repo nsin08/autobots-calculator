@@ -7,13 +7,15 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="calculator-container">
-        <div class="mode-toggle">
-            <button class="btn-toggle" id="modeToggle" onclick="toggleScientificMode()">Scientific</button>
-            <button class="btn-toggle" id="angleToggle" onclick="toggleAngleMode()">DEG</button>
-        </div>
-        
-        <div class="calculator">
+    <div class="main-container">
+        <div class="calculator-container">
+            <div class="mode-toggle">
+                <button class="btn-toggle" id="modeToggle" onclick="toggleScientificMode()">Scientific</button>
+                <button class="btn-toggle" id="angleToggle" onclick="toggleAngleMode()">DEG</button>
+                <button class="btn-toggle" id="historyToggle" onclick="toggleHistory()">History</button>
+            </div>
+            
+            <div class="calculator">
             <div class="display" id="display">0</div>
             <div class="error-message" id="error"></div>
             
@@ -54,6 +56,18 @@
             <button class="btn" onclick="appendDecimal()">.</button>
         </div>
     </div>
+        </div>
+        
+        <!-- History Panel -->
+        <div class="history-panel" id="historyPanel" style="display: none;">
+            <div class="history-header">
+                <h3>History</h3>
+                <button class="btn-clear-history" onclick="clearHistory()">Clear</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <p class="no-history">No history</p>
+            </div>
+        </div>
     </div>
     <script src="/static/app.js"></script>
 </body>

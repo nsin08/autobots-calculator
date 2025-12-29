@@ -106,6 +106,22 @@ http://localhost:5000
 3. Click `sin`
 4. Result: `0.5` (sin of 30 degrees)
 
+**Calculation History (v0.2.0+):**
+1. Click "History" button to toggle history panel
+2. Perform calculations - they automatically appear in history
+3. History shows last 20 calculations
+4. Click any history entry to load that result
+5. Click "Clear" button to remove all history
+6. History persists during browser session (sessionStorage)
+
+**History Features:**
+- Stores last 20 calculations (FIFO queue)
+- Shows expression and result for each calculation
+- Click to load result into calculator
+- Survives page refresh (same session)
+- Clear all history with one click
+- Responsive design: Side-by-side on desktop, stacked on mobile
+
 ## Endpoints
 
 ### GET /health
