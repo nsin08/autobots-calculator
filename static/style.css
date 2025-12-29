@@ -63,20 +63,36 @@ body {
     width: 100%;
 }
 
-.display {
+.display-container {
     background: #222;
-    color: #fff;
-    font-size: 2.5rem;
-    padding: 20px;
-    text-align: right;
     border-radius: 10px;
     margin-bottom: 10px;
-    min-height: 80px;
+    min-height: 100px;
+    max-height: 150px;
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow-y: auto;
+}
+
+.calculator-previous {
+    color: #a0aec0;
+    font-size: 1rem;
+    text-align: right;
+    min-height: 20px;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    margin-bottom: 5px;
+}
+
+.calculator-display {
+    color: #fff;
+    font-size: 2.5rem;
+    text-align: right;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    font-weight: 500;
 }
 
 .error-message {

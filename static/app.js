@@ -7,12 +7,15 @@ let angleMode = 'DEG'; // 'DEG' or 'RAD'
 let isHistoryVisible = false;
 let calculationHistory = [];
 const MAX_HISTORY = 20;
+let previousDisplay = '';
 
 const display = document.getElementById('display');
+const previousDisplayElement = document.getElementById('previousDisplay');
 const errorDisplay = document.getElementById('error');
 
 function updateDisplay() {
     display.textContent = currentInput;
+    previousDisplayElement.textContent = previousDisplay;
     errorDisplay.textContent = '';
 }
 
@@ -21,6 +24,7 @@ function clearDisplay() {
     operator = null;
     previousValue = null;
     waitingForOperand = false;
+    previousDisplay = '';
     updateDisplay();
 }
 
@@ -58,13 +62,19 @@ function appendOperator(op) {
     
     if (previousValue === null) {
         previousValue = inputValue;
+        previousDisplay = `${inputValue} ${op}`;
     } else if (operator) {
         // If there's a pending operation, calculate it first
         performCalculation();
+        previousDisplay = `${currentInput} ${op}`;
+    } else {
+        previousValue = inputValue;
+        previousDisplay = `${inputValue} ${op}`;
     }
     
     waitingForOperand = true;
     operator = op;
+    updateDisplay();
 }
 
 function performCalculation() {
@@ -124,6 +134,10 @@ function calculate() {
     if (operator === null || previousValue === null) {
         return;
     }
+    
+    const inputValue = parseFloat(currentInput);
+    const expression = `${previousValue} ${operator} ${inputValue}`;
+    previousDisplay = `${expression} =`;
     
     performCalculation();
     operator = null;
@@ -332,6 +346,7 @@ function renderHistory() {
 
 function loadFromHistory(entry) {
     currentInput = String(entry.result);
+    previousDisplay = entry.expression;
     operator = null;
     previousValue = null;
     waitingForOperand = true;
