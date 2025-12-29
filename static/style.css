@@ -14,13 +14,46 @@ body {
     padding: 20px;
 }
 
+.calculator-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.mode-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    justify-content: center;
+}
+
+.btn-toggle {
+    background: #fff;
+    border: 2px solid #667eea;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-toggle:hover {
+    background: #f7fafc;
+    transform: translateY(-2px);
+}
+
+.btn-toggle.active {
+    background: #667eea;
+    color: #fff;
+}
+
 .calculator {
     background: #fff;
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     padding: 20px;
     width: 100%;
-    max-width: 400px;
 }
 
 .display {
@@ -46,6 +79,36 @@ body {
     text-align: center;
     margin-bottom: 10px;
     font-weight: 500;
+}
+
+.scientific-panel {
+    display: none;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.btn-sci {
+    background: #9f7aea;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+}
+
+.btn-sci:hover {
+    background: #805ad5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-sci:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .buttons {
@@ -106,8 +169,16 @@ body {
 
 /* Responsive design for mobile */
 @media (max-width: 480px) {
-    .calculator {
+    .calculator-container {
         max-width: 100%;
+    }
+    
+    .mode-toggle {
+        flex-direction: column;
+    }
+    
+    .btn-toggle {
+        width: 100%;
     }
     
     .display {
@@ -120,6 +191,11 @@ body {
         font-size: 1.2rem;
         padding: 15px;
     }
+    
+    .btn-sci {
+        font-size: 1rem;
+        padding: 12px;
+    }
 }
 
 @media (max-width: 320px) {
@@ -131,5 +207,15 @@ body {
     .btn {
         font-size: 1rem;
         padding: 12px;
+    }
+    
+    .btn-sci {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+    
+    .scientific-panel {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
     }
 }

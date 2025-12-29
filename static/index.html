@@ -3,14 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculator</title>
+    <title>Scientific Calculator</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="calculator">
-        <div class="display" id="display">0</div>
-        <div class="error-message" id="error"></div>
-        <div class="buttons">
+    <div class="calculator-container">
+        <div class="mode-toggle">
+            <button class="btn-toggle" id="modeToggle" onclick="toggleScientificMode()">Scientific</button>
+            <button class="btn-toggle" id="angleToggle" onclick="toggleAngleMode()">DEG</button>
+        </div>
+        
+        <div class="calculator">
+            <div class="display" id="display">0</div>
+            <div class="error-message" id="error"></div>
+            
+            <!-- Scientific Functions Panel -->
+            <div class="scientific-panel" id="scientificPanel" style="display: none;">
+                <button class="btn btn-sci" onclick="calculateScientific('sin')">sin</button>
+                <button class="btn btn-sci" onclick="calculateScientific('cos')">cos</button>
+                <button class="btn btn-sci" onclick="calculateScientific('tan')">tan</button>
+                <button class="btn btn-sci" onclick="calculateScientific('sqrt')">√</button>
+                <button class="btn btn-sci" onclick="calculateScientific('log')">log</button>
+                <button class="btn btn-sci" onclick="calculateScientific('ln')">ln</button>
+                <button class="btn btn-sci" onclick="calculateScientific('exp')">exp</button>
+                <button class="btn btn-sci" onclick="calculateScientific('pi')">π</button>
+            </div>
+            
+            <div class="buttons">
             <button class="btn btn-clear" onclick="clearDisplay()">C</button>
             <button class="btn btn-operator" onclick="appendOperator('/')">/</button>
             <button class="btn btn-operator" onclick="appendOperator('*')">×</button>
@@ -34,6 +53,7 @@
             <button class="btn btn-zero" onclick="appendNumber('0')" style="grid-column: span 2;">0</button>
             <button class="btn" onclick="appendDecimal()">.</button>
         </div>
+    </div>
     </div>
     <script src="/static/app.js"></script>
 </body>
