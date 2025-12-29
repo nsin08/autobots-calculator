@@ -82,6 +82,65 @@ Returns basic service metrics.
 }
 ```
 
+### POST /api/calculate
+Performs basic arithmetic operations.
+
+**Request:**
+```json
+{
+  "operation": "add|subtract|multiply|divide",
+  "a": 10,
+  "b": 5
+}
+```
+
+**Response (Success - 200):**
+```json
+{
+  "result": 15
+}
+```
+
+**Response (Error - 400):**
+```json
+{
+  "error": "Division by zero"
+}
+```
+
+**Examples:**
+```bash
+# Addition
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "add", "a": 2, "b": 3}'
+# Returns: {"result": 5}
+
+# Subtraction
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "subtract", "a": 10, "b": 4}'
+# Returns: {"result": 6}
+
+# Multiplication
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "multiply", "a": 3, "b": 4}'
+# Returns: {"result": 12}
+
+# Division
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "divide", "a": 10, "b": 2}'
+# Returns: {"result": 5}
+
+# Error case: Division by zero
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "divide", "a": 10, "b": 0}'
+# Returns: {"error": "Division by zero"}
+```
+
 ## Development Workflow
 
 This project follows a 5-role lifecycle. See [RULEBANK.md](RULEBANK.md) for complete rules.

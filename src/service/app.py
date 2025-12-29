@@ -2,7 +2,7 @@
 Service application entry point.
 Minimal Flask service with health and metrics endpoints.
 """
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from datetime import datetime
 import time
 
@@ -45,13 +45,59 @@ def metrics():
     }), 200
 
 
+@app.route('/api/calculate', methods=['POST'])
+def calculate():
+    """
+    Calculate endpoint.
+    Performs basic arithmetic operations.
+    
+    Request body: {"operation": "add|subtract|multiply|divide", "a": number, "b": number}
+    Returns: {"result": number} or {"error": "message"}
+    """
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({'error': 'Request body must be JSON'}), 400
+    
+    operation = data.get('operation')
+    a = data.get('a')
+    b = data.get('b')
+    
+    # Validate inputs
+    if operation not in ['add', 'subtract', 'multiply', 'divide']:
+        return jsonify({'error': 'Invalid operation'}), 400
+    
+    if a is None or b is None:
+        return jsonify({'error': 'Missing operands'}), 400
+    
+    try:
+        a = float(a)
+        b = float(b)
+    except (ValueError, TypeError):
+        return jsonify({'error': 'Operands must be numbers'}), 400
+    
+    # Perform calculation
+    if operation == 'add':
+        result = a + b
+    elif operation == 'subtract':
+        result = a - b
+    elif operation == 'multiply':
+        result = a * b
+    elif operation == 'divide':
+        if b == 0:
+            return jsonify({'error': 'Division by zero'}), 400
+        result = a / b
+    
+    return jsonify({'result': result}), 200
+
+
 @app.route('/', methods=['GET'])
 def root():
     """Root endpoint with service info."""
     return jsonify({
-        'service': 'autobots-service-readiness-baseline',
+        'service': 'autobots-calculator',
         'version': '0.1.0',
-        'endpoints': ['/health', '/metrics']
+        'endpoints': ['/health', '/metrics', '/api/calculate']
     }), 200
 
 
