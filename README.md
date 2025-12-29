@@ -67,7 +67,7 @@ Once the service is running, open your browser and navigate to:
 http://localhost:5000
 ```
 
-**Calculator Features:**
+**Basic Calculator Features:**
 - Click number buttons (0-9) to enter numbers
 - Click operation buttons (+, -, ×, ÷) to select operation
 - Click = to calculate result
@@ -75,12 +75,36 @@ http://localhost:5000
 - Click ← to delete last character
 - Keyboard support: numbers, operators, Enter/=, Escape/C, Backspace
 
-**Example:**
+**Scientific Mode (v0.2.0+):**
+1. Click "Scientific" button to toggle scientific functions panel
+2. Click "DEG/RAD" button to switch between degrees and radians
+3. Scientific functions available:
+   - **sin, cos, tan**: Trigonometric functions (respects DEG/RAD mode)
+   - **√ (sqrt)**: Square root (requires non-negative number)
+   - **log**: Base-10 logarithm (requires positive number)
+   - **ln**: Natural logarithm (requires positive number)
+   - **exp**: Exponential function (e^x)
+   - **π (pi)**: Inserts π value (3.141592...)
+
+**Keyboard Shortcuts:**
+- `s` = sin
+- `o` = cos (o for cosine)
+- `t` = tan
+- `q` = sqrt (q for sQuare root)
+- `l` = log
+
+**Example (Basic):**
 1. Click `5`
 2. Click `+`
 3. Click `3`
 4. Click `=`
 5. Result: `8`
+
+**Example (Scientific):**
+1. Click "Scientific" to enable scientific mode
+2. Enter `30`
+3. Click `sin`
+4. Result: `0.5` (sin of 30 degrees)
 
 ## Endpoints
 

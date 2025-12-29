@@ -2,6 +2,8 @@ let currentInput = '0';
 let operator = null;
 let previousValue = null;
 let waitingForOperand = false;
+let isScientificMode = false;
+let angleMode = 'DEG'; // 'DEG' or 'RAD'
 
 const display = document.getElementById('display');
 const errorDisplay = document.getElementById('error');
@@ -138,5 +140,115 @@ document.addEventListener('keydown', (event) => {
         clearDisplay();
     } else if (key === 'Backspace') {
         deleteChar();
+    } else if (key === 's') {
+        calculateScientific('sin');
+    } else if (key === 'o') {
+        calculateScientific('cos');
+    } else if (key === 't') {
+        calculateScientific('tan');
+    } else if (key === 'q') {
+        calculateScientific('sqrt');
+    } else if (key === 'l') {
+        calculateScientific('log');
     }
 });
+
+// Toggle scientific mode
+function toggleScientificMode() {
+    isScientificMode = !isScientificMode;
+    const panel = document.getElementById('scientificPanel');
+    const toggle = document.getElementById('modeToggle');
+    
+    if (isScientificMode) {
+        panel.style.display = 'grid';
+        toggle.textContent = 'Basic';
+        toggle.classList.add('active');
+    } else {
+        panel.style.display = 'none';
+        toggle.textContent = 'Scientific';
+        toggle.classList.remove('active');
+    }
+}
+
+// Toggle angle mode (degrees/radians)
+function toggleAngleMode() {
+    angleMode = angleMode === 'DEG' ? 'RAD' : 'DEG';
+    const toggle = document.getElementById('angleToggle');
+    toggle.textContent = angleMode;
+}
+
+// Convert degrees to radians
+function toRadians(degrees) {
+    return degrees * (Math.PI / 180);
+}
+
+// Convert radians to degrees
+function toDegrees(radians) {
+    return radians * (180 / Math.PI);
+}
+
+// Calculate scientific functions
+function calculateScientific(func) {
+    const inputValue = parseFloat(currentInput);
+    
+    if (isNaN(inputValue)) {
+        errorDisplay.textContent = 'Invalid input';
+        return;
+    }
+    
+    let result;
+    
+    try {
+        switch(func) {
+            case 'sin':
+                result = angleMode === 'DEG' ? Math.sin(toRadians(inputValue)) : Math.sin(inputValue);
+                break;
+            case 'cos':
+                result = angleMode === 'DEG' ? Math.cos(toRadians(inputValue)) : Math.cos(inputValue);
+                break;
+            case 'tan':
+                result = angleMode === 'DEG' ? Math.tan(toRadians(inputValue)) : Math.tan(inputValue);
+                break;
+            case 'sqrt':
+                if (inputValue < 0) {
+                    errorDisplay.textContent = 'Cannot take square root of negative number';
+                    return;
+                }
+                result = Math.sqrt(inputValue);
+                break;
+            case 'log':
+                if (inputValue <= 0) {
+                    errorDisplay.textContent = 'Logarithm requires positive number';
+                    return;
+                }
+                result = Math.log10(inputValue);
+                break;
+            case 'ln':
+                if (inputValue <= 0) {
+                    errorDisplay.textContent = 'Natural log requires positive number';
+                    return;
+                }
+                result = Math.log(inputValue);
+                break;
+            case 'exp':
+                result = Math.exp(inputValue);
+                break;
+            case 'pi':
+                result = Math.PI;
+                break;
+            default:
+                errorDisplay.textContent = 'Unknown function';
+                return;
+        }
+        
+        // Round to avoid floating point precision issues
+        result = Math.round(result * 1e10) / 1e10;
+        currentInput = String(result);
+        waitingForOperand = true;
+        updateDisplay();
+        
+    } catch (error) {
+        errorDisplay.textContent = 'Calculation error';
+        console.error('Scientific calculation error:', error);
+    }
+}
