@@ -1,10 +1,12 @@
-# Service Readiness Baseline
+# Autobots Calculator
 
-A minimal service demonstrating health & observability endpoints with full project lifecycle.
+[![Tests](https://github.com/nsin08/autobots-calculator/actions/workflows/test.yml/badge.svg)](https://github.com/nsin08/autobots-calculator/actions/workflows/test.yml)
+
+A web-based calculator demonstrating a complete 5-role GitHub lifecycle workflow.
 
 ## Project
 
-**Use case:** "Health & Observability pack for a tiny service" (ship v0.1.0)
+**Live Demo:** http://localhost:5000 (when running locally)
 
 This project demonstrates a complete GitHub workflow from idea → Epic → Stories → implementation → review → release.
 
