@@ -107,14 +107,14 @@ Returns basic service metrics.
 ```
 
 ### POST /api/calculate
-Performs basic arithmetic operations.
+Performs arithmetic and advanced mathematical operations.
 
 **Request:**
 ```json
 {
-  "operation": "add|subtract|multiply|divide",
+  "operation": "add|subtract|multiply|divide|factorial|power|modulo",
   "a": 10,
-  "b": 5
+  "b": 5  // Optional for factorial
 }
 ```
 
@@ -132,6 +132,7 @@ Performs basic arithmetic operations.
 }
 ```
 
+#### Basic Operations
 **Examples:**
 ```bash
 # Addition
@@ -162,6 +163,62 @@ curl -X POST http://localhost:5000/api/calculate \
 curl -X POST http://localhost:5000/api/calculate \
   -H "Content-Type: application/json" \
   -d '{"operation": "divide", "a": 10, "b": 0}'
+# Returns: {"error": "Division by zero"}
+```
+
+#### Advanced Operations (v0.2.0+)
+
+**Factorial** - Computes n! (0 ≤ n ≤ 20, integer only)
+```bash
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "factorial", "a": 5}'
+# Returns: {"result": 120}
+
+# Error case: Negative number
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "factorial", "a": -5}'
+# Returns: {"error": "Factorial not defined for negative numbers"}
+
+# Error case: Non-integer
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "factorial", "a": 5.5}'
+# Returns: {"error": "Factorial requires integer input"}
+```
+
+**Power** - Computes a^b (exponent bounds: -100 ≤ b ≤ 100)
+```bash
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "power", "a": 2, "b": 3}'
+# Returns: {"result": 8}
+
+# Negative exponent
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "power", "a": 2, "b": -2}'
+# Returns: {"result": 0.25}
+
+# Error case: Exponent out of bounds
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "power", "a": 2, "b": 101}'
+# Returns: {"error": "Exponent out of bounds (-100 to 100)"}
+```
+
+**Modulo** - Computes a % b (remainder after division)
+```bash
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "modulo", "a": 10, "b": 3}'
+# Returns: {"result": 1}
+
+# Error case: Zero divisor
+curl -X POST http://localhost:5000/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "modulo", "a": 10, "b": 0}'
 # Returns: {"error": "Division by zero"}
 ```
 
