@@ -6,6 +6,7 @@ from flask import Flask, jsonify, request, send_from_directory
 from datetime import datetime
 import time
 import os
+import math
 
 app = Flask(__name__, static_folder='../../static')
 
@@ -50,9 +51,11 @@ def metrics():
 def calculate():
     """
     Calculate endpoint.
-    Performs basic arithmetic operations.
+    Performs arithmetic and advanced mathematical operations.
     
-    Request body: {"operation": "add|subtract|multiply|divide", "a": number, "b": number}
+    Request body: 
+        Basic: {"operation": "add|subtract|multiply|divide", "a": number, "b": number}
+        Advanced: {"operation": "factorial|power|modulo", "a": number, "b": number (if needed)}
     Returns: {"result": number} or {"error": "message"}
     """
     data = request.get_json()
@@ -64,10 +67,33 @@ def calculate():
     a = data.get('a')
     b = data.get('b')
     
-    # Validate inputs
-    if operation not in ['add', 'subtract', 'multiply', 'divide']:
+    # Validate operation
+    valid_operations = ['add', 'subtract', 'multiply', 'divide', 'factorial', 'power', 'modulo']
+    if operation not in valid_operations:
         return jsonify({'error': 'Invalid operation'}), 400
     
+    # Factorial only needs 'a'
+    if operation == 'factorial':
+        if a is None:
+            return jsonify({'error': 'Missing operand'}), 400
+        
+        try:
+            a = float(a)
+        except (ValueError, TypeError):
+            return jsonify({'error': 'Operand must be a number'}), 400
+        
+        # Validate factorial constraints
+        if a < 0:
+            return jsonify({'error': 'Factorial not defined for negative numbers'}), 400
+        if a != int(a):
+            return jsonify({'error': 'Factorial requires integer input'}), 400
+        if a > 20:
+            return jsonify({'error': 'Factorial input too large (max 20)'}), 400
+        
+        result = math.factorial(int(a))
+        return jsonify({'result': result}), 200
+    
+    # All other operations need both 'a' and 'b'
     if a is None or b is None:
         return jsonify({'error': 'Missing operands'}), 400
     
@@ -88,6 +114,15 @@ def calculate():
         if b == 0:
             return jsonify({'error': 'Division by zero'}), 400
         result = a / b
+    elif operation == 'power':
+        # Validate power bounds
+        if b > 100 or b < -100:
+            return jsonify({'error': 'Exponent out of bounds (-100 to 100)'}), 400
+        result = pow(a, b)
+    elif operation == 'modulo':
+        if b == 0:
+            return jsonify({'error': 'Division by zero'}), 400
+        result = a % b
     
     return jsonify({'result': result}), 200
 
