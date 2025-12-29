@@ -93,6 +93,25 @@ http://localhost:5000
 - `q` = sqrt (q for sQuare root)
 - `l` = log
 
+**Multiline Display (v0.2.0+):**
+The calculator features a multiline display showing:
+- **Previous line**: Shows the previous result or operation preview (e.g., "5 +" or "5 + 3 =")
+- **Current line**: Shows the current input or final result
+
+**Display Behavior:**
+- When entering an operation: Previous line shows "number operator" (e.g., "5 +")
+- After calculation: Previous line shows full expression with "=" (e.g., "5 + 3 =")
+- When loading from history: Previous line shows the original expression
+- When starting new calculation: Previous line clears
+- Overflow: Long numbers wrap or scroll automatically
+
+**Example (Multiline Display):**
+1. Enter `5` → Display shows: `0` (previous) / `5` (current)
+2. Click `+` → Display shows: `5 +` (previous) / `5` (current)
+3. Enter `3` → Display shows: `5 +` (previous) / `3` (current)
+4. Click `=` → Display shows: `5 + 3 =` (previous) / `8` (current)
+5. Click `+` → Display shows: `8 +` (previous) / `8` (current)
+
 **Example (Basic):**
 1. Click `5`
 2. Click `+`
