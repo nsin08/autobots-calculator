@@ -283,19 +283,25 @@ curl -X POST http://localhost:5000/api/calculate \
 
 ## Development Workflow
 
-This project follows a 5-role lifecycle. See [RULEBANK.md](RULEBANK.md) for complete rules.
+This project follows a 5-role lifecycle with **QA as a critical quality gate**. See [RULEBANK.md](RULEBANK.md) for complete rules.
 
 ### Roles
 1. **Sponsor/PO** - Creates Idea Issues
 2. **Tech Lead/Architect** - Converts to Epic + Stories
 3. **Implementer** - Builds features
-4. **Reviewer/QA** - Validates PRs
+4. **Reviewer/QA** - ⚠️ Quality gate: validates PRs against success criteria
 5. **Release/DevOps** - Ships releases
 
 ### State Machine
 ```
-Intake → Spec Ready → In Progress → In Review → Done → Released
+Intake → Spec Ready → In Progress → In Review (QA Gate) → Done → Released
 ```
+
+### Key Documentation
+- **Workflow Guide**: [docs/WORKFLOW_GUIDE.md](docs/WORKFLOW_GUIDE.md) - Complete step-by-step execution
+- **QA Guide**: [docs/QA_GUIDE.md](docs/QA_GUIDE.md) - Comprehensive QA protocols, manual testing, escalation
+- **Role Prompts**: [docs/ROLE_PROMPTS.md](docs/ROLE_PROMPTS.md) - Role-specific prompt templates
+- **Quick Start**: [docs/QUICKSTART.md](docs/QUICKSTART.md) - 30-minute workflow test
 
 ### Templates
 - **Epic**: [.github/ISSUE_TEMPLATE/epic.md](.github/ISSUE_TEMPLATE/epic.md)
@@ -306,6 +312,8 @@ Intake → Spec Ready → In Progress → In Review → Done → Released
 ## Testing the Workflow
 
 See [docs/WORKFLOW_GUIDE.md](docs/WORKFLOW_GUIDE.md) for step-by-step instructions on executing the complete lifecycle.
+
+For QA/Review process details, see [docs/QA_GUIDE.md](docs/QA_GUIDE.md).
 
 ## Example Epic
 

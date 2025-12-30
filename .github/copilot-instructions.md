@@ -59,12 +59,49 @@ All work flows through: `Intake → Spec Ready → In Progress → In Review →
 - Keep PRs small: 1 story per PR, 1-3 commits, no drive-by refactors
 
 ### When Acting as Tech Lead
+⚠️ **Tech Lead must challenge unclear requirements and collaborate - not just accept everything passively.**
+
+**Before creating Epic/Stories:**
+- Question the PO if requirements are unclear (comment on Idea Issue)
+- Challenge assumptions: Is this needed? Is scope too large? Technical risks?
+- Validate feasibility with implementers: effort estimate, blockers, dependencies
+- Push back if success criteria are not measurable or edge cases missing
+- Document Q&A with PO in Epic (what was clarified, what assumptions made)
+
+**When creating Epic/Stories:**
 - Split Epics into Stories that are independently testable
 - Add "Architecture Note" comments to Epic with:
   - API contracts (endpoint, request/response shape, status codes)
   - Test strategy (unit/integration scope)
   - Dependencies between stories
+  - Technical risks/unknowns
+  - Assumptions validated with PO
 - Example from Story #2: "GET /health → 200 {status:ok, timestamp:ISO8601} → Unit tests: status code, JSON shape, timestamp format"
+
+**Do NOT mark "Spec Ready" unless:**
+- [ ] Success criteria are measurable
+- [ ] Edge cases identified
+- [ ] Non-goals stated
+- [ ] Technical feasibility validated
+- [ ] PO confirms understanding
+- [ ] DoR satisfied
+
+### When Acting as Reviewer/QA
+⚠️ **QA is the quality gate between implementation and release.**
+
+- Follow comprehensive QA protocols in [docs/QA_GUIDE.md](../docs/QA_GUIDE.md)
+- Apply QA Review Checklist (pre-review, criteria validation, testing, code quality, docs, integration)
+- Perform manual testing for frontend/API changes (browser testing, responsive layouts, error states)
+- Provide concrete, actionable feedback with specific file/line references
+- Block PRs that don't meet Definition of Done
+- Escalate ambiguous requirements or scope creep
+
+See [docs/QA_GUIDE.md](../docs/QA_GUIDE.md) for:
+- Step-by-step review process
+- Manual testing protocols
+- Anti-patterns to avoid
+- Escalation procedures
+- Quality metrics tracking
 
 ## Role Prompts
 When invoking Copilot for lifecycle tasks, **always prefix** with role-specific prompt from [docs/ROLE_PROMPTS.md](../docs/ROLE_PROMPTS.md). Example:

@@ -54,12 +54,84 @@ Use the Idea/Story template and keep it focused.
 
 ### Role: Tech Lead/Architect
 
+⚠️ **Tech Lead must challenge unclear requirements and collaborate with PO/Implementers - not just accept everything passively.**
+
+### Step 1: Challenge and Clarify Requirements
+
+**Before creating any stories, question the PO:**
+
+```bash
+# Review the PO's Idea Issue
+gh issue view 1
+```
+
+**Ask these questions (comment on Issue #1):**
+```
+@PO - Questions before creating Epic/Stories:
+
+1. **Success Criteria Clarity:**
+   - You mentioned "service readiness baseline" - can you clarify priority: health vs metrics vs CI?
+   - What does "working" mean for each endpoint? (concrete examples)
+   - How will we know it's done? (acceptance test scenarios)
+
+2. **Scope Boundaries:**
+   - What's explicitly OUT of scope for v0.1.0?
+   - Are there features you're tempted to add but we should defer to v0.2.0?
+   - Target release timeline?
+
+3. **Edge Cases:**
+   - What happens when service is unhealthy?
+   - How should errors be reported?
+   - What metrics are critical vs nice-to-have?
+
+4. **Dependencies:**
+   - Does this depend on any infrastructure?
+   - Any integration points?
+   - Technical risks?
+
+**I'll create the Epic + Stories once these are clarified.**
+```
+
+**If PO's response is vague, push back:**
+```
+@PO - Still unclear on health endpoint success criteria. 
+Can you provide a concrete example?
+E.g., "When service is healthy, GET /health returns 200 with {status:ok, timestamp:ISO8601}"
+
+Cannot mark Spec Ready without measurable criteria.
+```
+
+### Step 2: Validate Technical Feasibility
+
+**Before finalizing stories, validate with potential implementers:**
+
+```
+@implementer - Tech feasibility check:
+
+Proposed Stories:
+1. Story: Health endpoint (GET /health)
+2. Story: Metrics endpoint (GET /metrics with counters)
+3. Story: CI setup (GitHub Actions + linting)
+
+Questions:
+- Any technical blockers?
+- Rough effort estimate (S/M/L per story)?
+- Should we use Flask or FastAPI?
+- Do we need a spike for metrics tracking approach?
+
+**Response needed before I mark Spec Ready.**
+```
+
+### Step 3: Create Epic + Stories (After Clarification)
+
+**Only after clarifying with PO and validating feasibility:**
+
 **Prompt to use:**
 ```
 [Role: Tech Lead/Architect]
 
 Take Issue #1 (Service readiness baseline) and convert to:
-1. Epic tracking overall v0.1.0 delivery
+1. Epic tracking overall v0.1.0 delivery (document Q&A with PO)
 2. Story A: Health endpoint implementation
 3. Story B: Metrics endpoint implementation  
 4. Story C: CI setup and release hygiene
@@ -69,24 +141,34 @@ For each story, add:
 - Test plan (unit tests required, edge cases)
 - Acceptance criteria mapped to parent Epic
 - Branch naming convention
+- Assumptions documented
 
-Architecture notes:
-- Use Flask (lightweight, well-known)
+Architecture notes (add to Epic):
+- Use Flask (lightweight, well-known) - validated with implementer
 - Health: stateless check, always returns 200 unless service is down
 - Metrics: in-memory counters (request_total, uptime_seconds)
 - Tests: pytest with Flask test client
 - CI: GitHub Actions (lint, test, coverage report)
+- Technical risks: None identified
+- Assumptions: No external dependencies required
 
-Mark stories as "Spec Ready" only after validating Definition of Ready.
+**Document in Epic:**
+- Questions asked to PO
+- PO's clarifications
+- Implementer feedback on feasibility
+- Assumptions made
+
+Mark stories as "Spec Ready" only after validating Definition of Ready AND PO confirms understanding.
 ```
 
 **Expected output:**
-- Epic #2 created with label `epic`
+- Epic #2 created with label `epic` (includes Q&A summary with PO)
 - Story #3: Health endpoint (label `story`, linked to Epic #2)
 - Story #4: Metrics endpoint (label `story`, linked to Epic #2)
 - Story #5: CI & Release (label `story`, linked to Epic #2)
-- Architecture comment added to Epic #2
+- Architecture comment added to Epic #2 (includes technical risks, assumptions)
 - All stories moved to `Spec Ready` column
+- PO confirms understanding (comment on Epic)
 
 ---
 
@@ -178,9 +260,35 @@ Keep PR small and focused.
 
 ---
 
-## Phase 4: Reviewer Validates PRs
+## Phase 4: Reviewer Validates PRs (QA Gate)
 
 ### Role: Reviewer/QA
+
+⚠️ **QA is the quality gate between implementation and release.**  
+📖 **See [QA_GUIDE.md](QA_GUIDE.md) for comprehensive QA protocols, manual testing procedures, and escalation paths.**
+
+### Pre-Review Validation
+
+Before detailed code review:
+
+```bash
+# Check PR status
+gh pr view 10
+
+# Verify CI status
+gh pr checks 10
+```
+
+**Pre-Review Checklist:**
+- [ ] PR linked to exactly one Issue
+- [ ] Issue linked to parent Epic
+- [ ] PR template fully filled (no placeholders)
+- [ ] CI checks passing (green builds)
+- [ ] Branch naming follows convention
+
+**Stop Criteria:** If any fail, request changes immediately without code review.
+
+### Review Process
 
 **Prompt to use (for PR #10):**
 ```
@@ -188,29 +296,110 @@ Keep PR small and focused.
 
 Review PR #10 (Health endpoint) against Story #3 and Epic #2.
 
-Use the Review Checklist:
-1. Verify PR links to Story #3 and Epic #2
-2. Check PR template is complete (no placeholders)
-3. Validate each success criterion has evidence:
-   - Endpoint returns 200? Check implementation + test
-   - Returns status:ok? Check code + test assertion
-   - Has timestamp? Check code + test
-   - Tests have >90% coverage? Check test file
-   - README updated? Check README diff
-4. Run tests locally: pytest tests/test_health.py
-5. Check for unrelated changes
-6. Verify naming conventions
+Apply the QA Review Checklist from QA_GUIDE.md:
+1. Pre-review validation (PR links, template, CI)
+2. Success criteria validation (map each to evidence):
+   - Endpoint returns 200? → Code + test
+   - Returns status:ok? → Code + test assertion
+   - Has timestamp? → Code + test
+   - Tests >90% coverage? → pytest --cov output
+   - README updated? → README diff
+3. Test coverage review (happy path + edge cases)
+4. Code quality (no unrelated changes, naming conventions)
+5. Documentation review (README, API docs)
+6. Integration check (run tests locally)
 
-Decision: Approve OR Request Changes with specific feedback.
+Run locally:
+  gh pr checkout 10
+  pytest tests/test_health.py -v
+  python -m src.service.app
+  curl http://localhost:5000/health
+
+Decision: Approve with evidence OR Request changes with concrete feedback.
+```
+
+### Manual Testing (If Needed)
+
+For frontend or API changes:
+
+**Backend API:**
+```bash
+# Test happy path
+curl http://localhost:5000/api/calculate -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"operation":"add","a":5,"b":3}'
+
+# Test error case
+curl http://localhost:5000/api/calculate -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"operation":"divide","a":5,"b":0}'
+```
+
+**Frontend:** (Open browser to http://localhost:5000)
+- Test interactions (buttons, inputs)
+- Test responsive layouts (320px, 768px, 1024px+)
+- Test error states
+- Document results
+
+See [QA_GUIDE.md](QA_GUIDE.md) section "Manual Testing Protocols" for detailed procedures.
+
+### Decision: Approve OR Request Changes
+
+#### If Approved ✅:
+```bash
+gh pr review 10 --approve --body "## QA Review: Approved ✅
+
+### Success Criteria Validation
+1. ✅ Endpoint returns 200 → test_health_endpoint_returns_200 (PASSING)
+2. ✅ JSON format correct → test_health_json_structure (PASSING)
+3. ✅ Timestamp ISO8601 → test_health_timestamp_format (PASSING)
+
+### Test Coverage
+- ✅ 3 tests added
+- ✅ Happy path covered
+- ✅ Coverage: 100% of app.py health endpoint
+
+### Code Quality
+- ✅ No unrelated changes
+- ✅ Naming conventions followed
+
+### CI Status
+- ✅ All checks passing (30 tests in 2.5s)
+
+**Approved for merge.**"
+
+gh pr merge 10 --squash
+```
+
+#### If Changes Needed 🔄:
+```bash
+gh pr comment 10 --body "## QA Review: Changes Requested 🔄
+
+### Issues Found
+
+**Critical (must fix):**
+- [ ] Criterion 3 not met: No test validates timestamp format
+  - Evidence missing: test_health_timestamp_is_iso8601
+  - Suggested fix: Add test in tests/test_health.py
+  - Pattern: assert response['timestamp'].endswith('Z')
+
+### Next Steps
+1. Add missing test
+2. Update PR with evidence
+3. Re-request review
+
+Moving story back to 'In Progress'."
 ```
 
 **Expected output:**
 - Review comment on PR #10 with checklist completed
 - Either:
-  - ✅ Approved → Story #3 moves to `Done`
+  - ✅ Approved → Merge PR → Story #3 moves to `Done`
   - 🔄 Changes requested → Story #3 back to `In Progress` with actionable feedback
 
 **Repeat for PR #11 (Metrics endpoint)**
+
+For comprehensive QA guidance including anti-patterns, escalation procedures, and quality metrics, see [QA_GUIDE.md](QA_GUIDE.md).
 
 ---
 
