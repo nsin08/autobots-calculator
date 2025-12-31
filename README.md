@@ -53,12 +53,27 @@ cd autobots
 # Install dependencies
 pip install -r requirements.txt
 
+# Database setup (automatic on first run)
+# SQLite database (calculator.db) will be created automatically
+# For testing, an in-memory database is used
+
 # Run the service
 python -m src.service.app
 
 # Run tests
 pytest tests/
 ```
+
+### Database
+
+The application uses SQLite for data persistence:
+- **Location:** `calculator.db` in project root
+- **Auto-initialization:** Database and tables created on first app startup
+- **Testing:** In-memory SQLite database (no file created)
+- **Migration path:** Built with SQLAlchemy ORM for easy PostgreSQL migration later
+
+**Database Models:**
+- `User`: Stores user accounts with bcrypt password hashing
 
 ### Using the Calculator
 
