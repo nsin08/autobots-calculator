@@ -7,8 +7,12 @@ from datetime import datetime
 import time
 import os
 import math
+from src.service.database import init_db
 
 app = Flask(__name__, static_folder='../../static')
+
+# Initialize database
+init_db(app)
 
 # Track service start time
 START_TIME = time.time()
