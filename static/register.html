@@ -5,246 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Calculator</title>
     <link rel="stylesheet" href="/static/style.css">
-    <style>
-        .auth-container {
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 40px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .auth-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .auth-header h1 {
-            color: #333;
-            margin: 0 0 10px 0;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 500;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        .form-group input:focus {
-            outline: none;
-            border-color: #4CAF50;
-        }
-        .form-group small {
-            display: block;
-            margin-top: 5px;
-            color: #777;
-            font-size: 12px;
-        }
-        .btn-auth {
-            width: 100%;
-            padding: 12px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .btn-auth:hover {
-            background: #45a049;
-        }
-        .btn-auth:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        .error-message {
-            color: #f44336;
-            font-size: 14px;
-            margin-top: 10px;
-            display: none;
-        }
-        .error-message.show {
-            display: block;
-        }
-        .success-message {
-            color: #4CAF50;
-            font-size: 14px;
-            margin-top: 10px;
-            display: none;
-        }
-        .success-message.show {
-            display: block;
-        }
-        .auth-footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-        }
-        .auth-footer a {
-            color: #4CAF50;
-            text-decoration: none;
-        }
-        .auth-footer a:hover {
-            text-decoration: underline;
-        }
-    </style>
 </head>
 <body>
     <div class="auth-container">
-        <div class="auth-header">
+        <div class="auth-card">
             <h1>Create Account</h1>
-            <p>Register to start using the calculator</p>
-        </div>
-        
-        <form id="registerForm">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required autofocus>
-                <small>3-50 characters, alphanumeric and underscores</small>
-            </div>
+            <p class="auth-subtitle">Sign up to save your calculations</p>
             
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-                <small>Valid email address</small>
-            </div>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        required 
+                        minlength="3" 
+                        maxlength="50"
+                        placeholder="Enter username (3-50 characters)"
+                        autocomplete="username"
+                    >
+                    <span class="form-error" id="usernameError"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        required 
+                        maxlength="100"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                    >
+                    <span class="form-error" id="emailError"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required 
+                        minlength="8"
+                        placeholder="Enter password (min 8 characters)"
+                        autocomplete="new-password"
+                    >
+                    <span class="form-error" id="passwordError"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        name="confirmPassword" 
+                        required 
+                        minlength="8"
+                        placeholder="Confirm your password"
+                        autocomplete="new-password"
+                    >
+                    <span class="form-error" id="confirmPasswordError"></span>
+                </div>
+                
+                <div class="error-message" id="formError"></div>
+                
+                <button type="submit" class="btn-primary" id="registerBtn">Register</button>
+            </form>
             
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-                <small>Minimum 8 characters</small>
-            </div>
-            
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
-            </div>
-            
-            <div class="error-message" id="error"></div>
-            <div class="success-message" id="success"></div>
-            
-            <button type="submit" class="btn-auth" id="registerBtn">Register</button>
-        </form>
-        
-        <div class="auth-footer">
-            Already have an account? <a href="/static/login.html">Login</a>
+            <p class="auth-footer">
+                Already have an account? <a href="/static/login.html">Login here</a>
+            </p>
         </div>
     </div>
     
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const errorDiv = document.getElementById('error');
-            const successDiv = document.getElementById('success');
-            const registerBtn = document.getElementById('registerBtn');
-            
-            // Clear previous messages
-            errorDiv.classList.remove('show');
-            successDiv.classList.remove('show');
-            errorDiv.textContent = '';
-            successDiv.textContent = '';
-            
-            // Client-side validation
-            if (!username || !email || !password || !confirmPassword) {
-                errorDiv.textContent = 'Please fill in all fields';
-                errorDiv.classList.add('show');
-                return;
-            }
-            
-            if (username.length < 3 || username.length > 50) {
-                errorDiv.textContent = 'Username must be 3-50 characters';
-                errorDiv.classList.add('show');
-                return;
-            }
-            
-            if (password.length < 8) {
-                errorDiv.textContent = 'Password must be at least 8 characters';
-                errorDiv.classList.add('show');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                errorDiv.textContent = 'Passwords do not match';
-                errorDiv.classList.add('show');
-                return;
-            }
-            
-            // Basic email validation
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(email)) {
-                errorDiv.textContent = 'Invalid email format';
-                errorDiv.classList.add('show');
-                return;
-            }
-            
-            // Disable button during request
-            registerBtn.disabled = true;
-            registerBtn.textContent = 'Creating account...';
-            
-            try {
-                const response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, email, password })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    // Show success message
-                    successDiv.textContent = 'Account created successfully! Redirecting to login...';
-                    successDiv.classList.add('show');
-                    
-                    // Redirect to login after 2 seconds
-                    setTimeout(() => {
-                        window.location.href = '/static/login.html';
-                    }, 2000);
-                } else {
-                    // Show error message
-                    errorDiv.textContent = data.error || 'Registration failed';
-                    errorDiv.classList.add('show');
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = 'Register';
-                }
-            } catch (error) {
-                errorDiv.textContent = 'Network error. Please try again.';
-                errorDiv.classList.add('show');
-                registerBtn.disabled = false;
-                registerBtn.textContent = 'Register';
-            }
-        });
-        
-        // Check if already logged in
-        window.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const response = await fetch('/api/auth/status');
-                const data = await response.json();
-                
-                if (data.authenticated) {
-                    // Already logged in, redirect to calculator
-                    window.location.href = '/';
-                }
-            } catch (error) {
-                // Not logged in, stay on register page
-            }
-        });
-    </script>
+    <script src="/static/app.js"></script>
 </body>
 </html>

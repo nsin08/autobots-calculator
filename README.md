@@ -78,7 +78,30 @@ The application uses SQLite for data persistence:
 
 ### Authentication (v0.3.0-alpha+)
 
-The calculator now includes user authentication:
+The calculator now includes full user authentication with registration and login pages.
+
+#### Frontend Pages
+
+**Register Page** (`/static/register.html`):
+- Clean, modern form with gradient styling
+- Fields: Username (3-50 chars), Email (valid format), Password (8+ chars), Confirm Password
+- Client-side validation with real-time error messages
+- Duplicate username/email detection (server-side)
+- "Already have account?" link → Login page
+
+**Login Page** (`/static/login.html`):
+- Simple username + password form
+- Client-side validation before submission
+- "Don't have account?" link → Register page
+- "Continue as guest" option for quick access
+
+**Session Persistence:**
+- User info stored in `sessionStorage` (client-side)
+- Keys: `user_id`, `username`, `isAuthenticated`
+- Auto-check on page load via `/api/auth/status`
+- Calculator shows "Welcome, {username}" + Logout button when logged in
+
+#### Backend API
 
 **Registration:**
 ```bash
@@ -89,6 +112,17 @@ POST /api/auth/register
   "password": "mypassword"      # min 8 characters
 }
 ```
+**Response (201 Created):**
+```json
+{
+  "user_id": 1,
+  "username": "myusername",
+  "email": "user@example.com"
+}
+```
+**Errors:**
+- 400: Missing/invalid fields (email format, length constraints)
+- 409: Duplicate username or email
 
 **Login:**
 ```bash
@@ -98,25 +132,89 @@ POST /api/auth/login
   "password": "mypassword"
 }
 ```
+**Response (200 OK):**
+```json
+{
+  "user_id": 1,
+  "username": "myusername"
+}
+```
+**Errors:**
+- 400: Missing fields
+- 401: Invalid username or password
 
 **Logout:**
 ```bash
 GET /api/auth/logout
+```
+**Response (200 OK):**
+```json
+{
+  "message": "Logged out successfully"
+}
 ```
 
 **Check Status:**
 ```bash
 GET /api/auth/status
 ```
+**Response (200 OK, authenticated):**
+```json
+{
+  "authenticated": true,
+  "user_id": 1,
+  "username": "myusername"
+}
+```
+**Response (200 OK, not authenticated):**
+```json
+{
+  "authenticated": false
+}
+```
 
 **Session Details:**
-- Sessions persist for 24 hours
-- Passwords hashed with bcrypt (never stored plain-text)
-- Session cookies used for authentication
+- Sessions persist for 24 hours (configurable via `PERMANENT_SESSION_LIFETIME`)
+- Passwords hashed with bcrypt (12 rounds, never stored plain-text)
+- Session cookies: `session` (Flask session), HTTP-only, secure in production
+- Flask-Login integration for user loader and session management
+- Guest mode: No server session, all operations client-side only
 
 ### Using the Calculator
 
-Once the service is running, open your browser and navigate to:
+#### First Time Setup (v0.3.0-alpha+)
+
+When you first access the calculator:
+1. Navigate to `http://localhost:5000`
+2. You'll see the **Register** page
+3. **Option 1: Create an account** (recommended for saving history later)
+   - Enter username (3-50 characters, unique)
+   - Enter email address (valid format, unique)
+   - Enter password (minimum 8 characters)
+   - Confirm password (must match)
+   - Click "Register"
+4. **Option 2: Continue as guest**
+   - Click "Continue as guest" to use calculator without account
+
+**Returning Users:**
+- Navigate to `http://localhost:5000` → Login page
+- Enter username and password
+- Click "Login"
+- Or click "Continue as guest" for guest access
+
+**Navigation:**
+- **Register page** (`/static/register.html`): Create new account
+- **Login page** (`/static/login.html`): Sign in or continue as guest
+- **Calculator** (`/static/index.html` or `/`): Main calculator interface
+
+**Session Management:**
+- Logged-in users: Session persists for 24 hours
+- Guest mode: No session, calculations not saved to server
+- Logout: Click "Logout" button in calculator header (logged-in users only)
+
+#### Calculator Interface
+
+Once authenticated (or as guest), the calculator loads at:
 ```
 http://localhost:5000
 ```

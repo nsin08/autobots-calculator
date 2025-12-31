@@ -123,6 +123,7 @@ def test_get_history_empty(auth_client):
 
 def test_get_history_with_calculations(auth_client, test_user):
     """Test getting history with existing calculations."""
+    import time
     # Add some calculations
     calc1 = CalculationHistory(
         user_id=test_user.id,
@@ -130,13 +131,18 @@ def test_get_history_with_calculations(auth_client, test_user):
         expression='5 + 3',
         result='8'
     )
+    db.session.add(calc1)
+    db.session.commit()
+    
+    # Small delay to ensure different timestamps
+    time.sleep(0.01)
+    
     calc2 = CalculationHistory(
         user_id=test_user.id,
         calculation_type='scientific',
         expression='sqrt(16)',
         result='4'
     )
-    db.session.add(calc1)
     db.session.add(calc2)
     db.session.commit()
     
