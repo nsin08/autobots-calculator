@@ -34,8 +34,9 @@ def db(app):
 @pytest.fixture(scope='function')
 def client(app):
     """
-    Create test client.
+    Create test client with session cookie support.
     """
+    app.config['WTF_CSRF_ENABLED'] = False
     return app.test_client()
 
 
@@ -48,7 +49,7 @@ def test_user(db):
         username='testuser',
         email='test@example.com'
     )
-    user.set_password('TestPassword123')
+    user.set_password('testpass123')  # Match password used in tests
     db.session.add(user)
     db.session.commit()
     return user

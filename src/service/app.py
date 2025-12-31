@@ -3,16 +3,36 @@ Service application entry point.
 Minimal Flask service with health and metrics endpoints.
 """
 from flask import Flask, jsonify, request, send_from_directory
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import os
 import math
-from src.service.database import init_db
+from src.service.database import init_db, db
+from src.service.models import User
+from flask_login import LoginManager
 
 app = Flask(__name__, static_folder='../../static')
 
+# Configure Flask app
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
+
 # Initialize database
 init_db(app)
+
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = None  # API, no redirect
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Load user by ID for Flask-Login."""
+    return User.query.get(int(user_id))
+
+# Register auth blueprint
+from src.service.auth import auth_bp
+app.register_blueprint(auth_bp)
 
 # Track service start time
 START_TIME = time.time()
