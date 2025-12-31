@@ -375,3 +375,253 @@ function toggleHistory() {
 
 // Load history on page load
 window.addEventListener('load', loadHistory);
+
+// ============== AUTH FUNCTIONS ==============
+
+// Check auth status on page load
+window.addEventListener('load', checkAuthStatus);
+
+async function checkAuthStatus() {
+    try {
+        const response = await fetch('/api/auth/status');
+        const data = await response.json();
+        
+        if (data.authenticated) {
+            // Store user info in sessionStorage
+            sessionStorage.setItem('userId', data.user_id);
+            sessionStorage.setItem('username', data.username);
+            sessionStorage.setItem('isAuthenticated', 'true');
+            
+            // Update UI if on calculator page
+            if (document.getElementById('display')) {
+                showUserInfo(data.username);
+            }
+        } else {
+            // Clear session storage
+            sessionStorage.removeItem('userId');
+            sessionStorage.removeItem('username');
+            sessionStorage.removeItem('isAuthenticated');
+            
+            // Redirect to login if on protected pages (future use)
+            // For now, allow guest access to calculator
+        }
+    } catch (error) {
+        console.error('Auth status check failed:', error);
+    }
+}
+
+function showUserInfo(username) {
+    // Add user info to calculator UI
+    const modeToggle = document.querySelector('.mode-toggle');
+    if (modeToggle && !document.getElementById('userInfo')) {
+        const userInfo = document.createElement('div');
+        userInfo.id = 'userInfo';
+        userInfo.className = 'user-info';
+        userInfo.innerHTML = `
+            <span>Welcome, ${username}</span>
+            <button class="btn-toggle" onclick="handleLogout()">Logout</button>
+        `;
+        modeToggle.appendChild(userInfo);
+    }
+}
+
+// Registration handler
+async function handleRegister(event) {
+    event.preventDefault();
+    
+    // Clear previous errors
+    clearFormErrors();
+    
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    // Client-side validation
+    let hasError = false;
+    
+    if (username.length < 3 || username.length > 50) {
+        showFieldError('username', 'Username must be 3-50 characters');
+        hasError = true;
+    }
+    
+    if (!isValidEmail(email)) {
+        showFieldError('email', 'Please enter a valid email address');
+        hasError = true;
+    }
+    
+    if (password.length < 8) {
+        showFieldError('password', 'Password must be at least 8 characters');
+        hasError = true;
+    }
+    
+    if (password !== confirmPassword) {
+        showFieldError('confirmPassword', 'Passwords do not match');
+        hasError = true;
+    }
+    
+    if (hasError) {
+        return;
+    }
+    
+    // Disable submit button
+    const registerBtn = document.getElementById('registerBtn');
+    registerBtn.disabled = true;
+    registerBtn.textContent = 'Creating account...';
+    
+    try {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Registration successful - auto login
+            sessionStorage.setItem('userId', data.user_id);
+            sessionStorage.setItem('username', data.username);
+            sessionStorage.setItem('isAuthenticated', 'true');
+            
+            // Redirect to calculator
+            window.location.href = '/static/index.html';
+        } else {
+            // Show error from server
+            showFormError(data.error || 'Registration failed');
+            registerBtn.disabled = false;
+            registerBtn.textContent = 'Register';
+        }
+    } catch (error) {
+        showFormError('Network error. Please try again.');
+        registerBtn.disabled = false;
+        registerBtn.textContent = 'Register';
+    }
+}
+
+// Login handler
+async function handleLogin(event) {
+    event.preventDefault();
+    
+    // Clear previous errors
+    clearFormErrors();
+    
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    
+    // Client-side validation
+    if (!username) {
+        showFieldError('username', 'Username is required');
+        return;
+    }
+    
+    if (!password) {
+        showFieldError('password', 'Password is required');
+        return;
+    }
+    
+    // Disable submit button
+    const loginBtn = document.getElementById('loginBtn');
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Logging in...';
+    
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Login successful
+            sessionStorage.setItem('userId', data.user_id);
+            sessionStorage.setItem('username', data.username);
+            sessionStorage.setItem('isAuthenticated', 'true');
+            
+            // Redirect to calculator
+            window.location.href = '/static/index.html';
+        } else {
+            // Show error from server
+            showFormError(data.error || 'Login failed');
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Login';
+        }
+    } catch (error) {
+        showFormError('Network error. Please try again.');
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
+    }
+}
+
+// Logout handler
+async function handleLogout() {
+    try {
+        await fetch('/api/auth/logout');
+        
+        // Clear session storage
+        sessionStorage.removeItem('userId');
+        sessionStorage.removeItem('username');
+        sessionStorage.removeItem('isAuthenticated');
+        
+        // Redirect to login page
+        window.location.href = '/static/login.html';
+    } catch (error) {
+        console.error('Logout failed:', error);
+        // Still clear local session and redirect
+        sessionStorage.clear();
+        window.location.href = '/static/login.html';
+    }
+}
+
+// Form validation helpers
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function showFieldError(fieldId, message) {
+    const errorElement = document.getElementById(`${fieldId}Error`);
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+    
+    const inputElement = document.getElementById(fieldId);
+    if (inputElement) {
+        inputElement.classList.add('error');
+    }
+}
+
+function showFormError(message) {
+    const formError = document.getElementById('formError');
+    if (formError) {
+        formError.textContent = message;
+        formError.style.display = 'block';
+    }
+}
+
+function clearFormErrors() {
+    // Clear field errors
+    const errorElements = document.querySelectorAll('.form-error');
+    errorElements.forEach(el => {
+        el.textContent = '';
+        el.style.display = 'none';
+    });
+    
+    // Clear form error
+    const formError = document.getElementById('formError');
+    if (formError) {
+        formError.textContent = '';
+        formError.style.display = 'none';
+    }
+    
+    // Remove error class from inputs
+    const inputs = document.querySelectorAll('input.error');
+    inputs.forEach(input => input.classList.remove('error'));
+}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Calculator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1>Create Account</h1>
+            <p class="auth-subtitle">Sign up to save your calculations</p>
+            
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        required 
+                        minlength="3" 
+                        maxlength="50"
+                        placeholder="Enter username (3-50 characters)"
+                        autocomplete="username"
+                    >
+                    <span class="form-error" id="usernameError"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        required 
+                        maxlength="100"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                    >
+                    <span class="form-error" id="emailError"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required 
+                        minlength="8"
+                        placeholder="Enter password (min 8 characters)"
+                        autocomplete="new-password"
+                    >
+                    <span class="form-error" id="passwordError"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        name="confirmPassword" 
+                        required 
+                        minlength="8"
+                        placeholder="Confirm your password"
+                        autocomplete="new-password"
+                    >
+                    <span class="form-error" id="confirmPasswordError"></span>
+                </div>
+                
+                <div class="error-message" id="formError"></div>
+                
+                <button type="submit" class="btn-primary" id="registerBtn">Register</button>
+            </form>
+            
+            <p class="auth-footer">
+                Already have an account? <a href="/static/login.html">Login here</a>
+            </p>
+        </div>
+    </div>
+    
+    <script src="/static/app.js"></script>
+</body>
+</html>
