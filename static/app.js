@@ -1,3 +1,60 @@
+// Authentication state and checking
+async function checkAuth() {
+    try {
+        const response = await fetch('/api/auth/status');
+        const data = await response.json();
+        
+        if (!data.authenticated) {
+            // Not authenticated, redirect to login
+            window.location.href = '/static/login.html';
+            return false;
+        }
+        
+        // Update UI with user info
+        const userElement = document.getElementById('currentUser');
+        if (userElement) {
+            userElement.textContent = `Welcome, ${data.username}`;
+        }
+        
+        // Store in localStorage for convenience
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('authenticated', 'true');
+        
+        return true;
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        window.location.href = '/static/login.html';
+        return false;
+    }
+}
+
+async function logout() {
+    try {
+        await fetch('/api/auth/logout');
+        
+        // Clear localStorage
+        localStorage.removeItem('username');
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('authenticated');
+        
+        // Redirect to login
+        window.location.href = '/static/login.html';
+    } catch (error) {
+        console.error('Logout failed:', error);
+        // Force redirect anyway
+        window.location.href = '/static/login.html';
+    }
+}
+
+// Check auth on page load
+window.addEventListener('DOMContentLoaded', async () => {
+    const isAuthenticated = await checkAuth();
+    if (isAuthenticated) {
+        // Load history from sessionStorage
+        loadHistoryFromStorage();
+    }
+});
+
 let currentInput = '0';
 let operator = null;
 let previousValue = null;

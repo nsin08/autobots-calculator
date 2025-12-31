@@ -30,9 +30,13 @@ def load_user(user_id):
     """Load user by ID for Flask-Login."""
     return User.query.get(int(user_id))
 
-# Register auth blueprint
+# Register blueprints
 from src.service.auth import auth_bp
+from src.service.history import history_bp
+from src.service.calculators.financial import financial_bp
 app.register_blueprint(auth_bp)
+app.register_blueprint(history_bp)
+app.register_blueprint(financial_bp)
 
 # Track service start time
 START_TIME = time.time()

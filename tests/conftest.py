@@ -53,3 +53,16 @@ def test_user(db):
     db.session.add(user)
     db.session.commit()
     return user
+
+
+@pytest.fixture(scope='function')
+def auth_client(client, test_user):
+    """
+    Create test client with authenticated session.
+    """
+    # Login the test user
+    client.post('/api/auth/login', json={
+        'username': 'testuser',
+        'password': 'testpass123'
+    })
+    return client
