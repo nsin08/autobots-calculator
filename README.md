@@ -74,6 +74,45 @@ The application uses SQLite for data persistence:
 
 **Database Models:**
 - `User`: Stores user accounts with bcrypt password hashing
+- Flask-Login integration for session management
+
+### Authentication (v0.3.0-alpha+)
+
+The calculator now includes user authentication:
+
+**Registration:**
+```bash
+POST /api/auth/register
+{
+  "username": "myusername",    # 3-50 characters, unique
+  "email": "user@example.com",  # valid email, unique
+  "password": "mypassword"      # min 8 characters
+}
+```
+
+**Login:**
+```bash
+POST /api/auth/login
+{
+  "username": "myusername",
+  "password": "mypassword"
+}
+```
+
+**Logout:**
+```bash
+GET /api/auth/logout
+```
+
+**Check Status:**
+```bash
+GET /api/auth/status
+```
+
+**Session Details:**
+- Sessions persist for 24 hours
+- Passwords hashed with bcrypt (never stored plain-text)
+- Session cookies used for authentication
 
 ### Using the Calculator
 
